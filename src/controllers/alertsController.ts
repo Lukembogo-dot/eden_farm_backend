@@ -1,17 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase';
+import { alertsRepository } from '../repositories/alertsRepository';
 
 // GET /api/alerts
 export const getAlerts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-
-    const { data, error } = await supabase
-      .from('alerts')
-      .select('*')
-      .eq('farm_id', farmId)
-      .eq('is_resolved', false)
-      .order('created_at', { ascending: false });
+    const { data, error } = await alertsRepository.getAll();
 
     if (error) throw error;
 
@@ -24,14 +17,9 @@ export const getAlerts = async (req: Request, res: Response, next: NextFunction)
 // PATCH /api/alerts/:id/resolve
 export const resolveAlert = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
-    const { data, error } = await supabase
-      .from('alerts')
-      .update({ is_resolved: true, resolved_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await alertsRepository.resolve(id);
 
     if (error) throw error;
 

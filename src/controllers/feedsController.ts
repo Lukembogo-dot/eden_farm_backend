@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase';
+import { feedsRepository } from '../repositories/feedsRepository';
+import { FeedStock } from '../types/feeds';
 
 // GET /api/feeds
 export const getFeedStock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-
-    const { data, error } = await supabase
-      .from('feed_stock')
-      .select('*')
-      .eq('farm_id', farmId)
-      .order('feed_name');
+    const { data, error } = await feedsRepository.getAll();
 
     if (error) throw error;
 
@@ -29,19 +24,22 @@ export const getFeedStock = async (req: Request, res: Response, next: NextFuncti
 // POST /api/feeds
 export const createFeedStock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-    const { feed_name, species, quantity_kg, unit_cost_per_kg, supplier, reorder_level_kg } = req.body;
+    const { feed_name, species, quantity_kg, unit_cost_per_kg, supplier, reorder_level_kg } = req.body as FeedStock;
 
     if (!feed_name) {
       res.status(400).json({ success: false, error: 'feed_name is required' });
       return;
     }
 
-    const { data, error } = await supabase
-      .from('feed_stock')
-      .insert([{ farm_id: farmId, feed_name, species, quantity_kg, unit_cost_per_kg, supplier, reorder_level_kg, last_restocked: new Date().toISOString().split('T')[0] }])
-      .select()
-      .single();
+    const { data, error } = await feedsRepository.create({
+      farm_id: 'a0000000-0000-0000-0000-000000000001',
+      feed_name,
+      species,
+      quantity_kg,
+      unit_cost_per_kg,
+      supplier,
+      reorder_level_kg,
+    } as FeedStock);
 
     if (error) throw error;
 
@@ -54,25 +52,16 @@ export const createFeedStock = async (req: Request, res: Response, next: NextFun
 // PATCH /api/feeds/:id/restock
 export const restockFeed = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { quantity_kg } = req.body;
 
-    const { data: current, error: fetchError } = await supabase
-      .from('feed_stock')
-      .select('quantity_kg')
-      .eq('id', id)
-      .single();
+    const { data: current, error: fetchError } = await feedsRepository.getById(id);
 
     if (fetchError) throw fetchError;
 
     const newQty = (current.quantity_kg || 0) + quantity_kg;
 
-    const { data, error } = await supabase
-      .from('feed_stock')
-      .update({ quantity_kg: newQty, last_restocked: new Date().toISOString().split('T')[0], updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await feedsRepository.update(id, { quantity_kg: newQty });
 
     if (error) throw error;
 

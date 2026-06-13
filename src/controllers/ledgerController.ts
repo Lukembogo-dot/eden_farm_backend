@@ -1,33 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase';
+import { ledgerRepository } from '../repositories/ledgerRepository';
+import { LedgerEntry } from '../types/ledger';
 
 // GET /api/ledger
 export const getLedger = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-
-    // Debug: test raw query without filter
-    const { data: allData, error: allError } = await supabase
-      .from('ledger')
-      .select('*')
-      .limit(5);
-
-    console.log('RAW QUERY (no filter):', allData, allError);
-
-    // Debug: test with farm filter
-    const { data: filteredData, error: filteredError } = await supabase
-      .from('ledger')
-      .select('*')
-      .eq('farm_id', farmId)
-      .limit(5);
-
-    console.log('FILTERED QUERY:', filteredData, filteredError);
+    const { data: allData, error: allError } = await ledgerRepository.getAll();
+    const { data: filteredData, error: filteredError } = await ledgerRepository.getByFarm();
 
     res.json({
       debug: {
-        raw: { count: allData?.length, error: allError, sample: allData?.[0] },
-        filtered: { count: filteredData?.length, error: filteredError }
-      }
+        raw: { count: allData?.length ?? 0, error: allError, sample: allData?.[0] },
+        filtered: { count: filteredData?.length ?? 0, error: filteredError, sample: filteredData?.[0] },
+      },
     });
   } catch (err) {
     next(err);
@@ -37,36 +22,11 @@ export const getLedger = async (req: Request, res: Response, next: NextFunction)
 // GET /api/ledger/summary
 export const getLedgerSummary = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-
-    const { data, error } = await supabase
-      .from('ledger')
-      .select('category, amount, entry_type')
-      .eq('farm_id', farmId);
-
-    if (error) throw error;
-
-    const summary: Record<string, number> = {};
-    let totalExpenses = 0;
-    let totalIncome = 0;
-
-    data.forEach((entry) => {
-      if (entry.entry_type === 'income') {
-        totalIncome += entry.amount;
-      } else {
-        totalExpenses += entry.amount;
-        summary[entry.category] = (summary[entry.category] || 0) + entry.amount;
-      }
-    });
+    const summary = await ledgerRepository.getSummary();
 
     res.json({
       success: true,
-      data: {
-        totalExpenses,
-        totalIncome,
-        netPosition: totalIncome - totalExpenses,
-        byCategory: summary,
-      },
+      data: summary,
     });
   } catch (err) {
     next(err);
@@ -76,19 +36,23 @@ export const getLedgerSummary = async (req: Request, res: Response, next: NextFu
 // POST /api/ledger
 export const createLedgerEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const farmId = 'a0000000-0000-0000-0000-000000000001';
-    const { entry_date, description, category, amount, entry_type, reference, notes } = req.body;
+    const { entry_date, description, category, amount, entry_type, reference, notes } = req.body as LedgerEntry;
 
-    if (!entry_date || !description || !category || !amount) {
+    if (!entry_date || !description || !category || amount === undefined || amount === null) {
       res.status(400).json({ success: false, error: 'entry_date, description, category and amount are required' });
       return;
     }
 
-    const { data, error } = await supabase
-      .from('ledger')
-      .insert([{ farm_id: farmId, entry_date, description, category, amount, entry_type: entry_type || 'expense', reference, notes }])
-      .select()
-      .single();
+    const { data, error } = await ledgerRepository.create({
+      farm_id: 'a0000000-0000-0000-0000-000000000001',
+      entry_date,
+      description,
+      category,
+      amount,
+      entry_type,
+      reference,
+      notes,
+    });
 
     if (error) throw error;
 
@@ -101,9 +65,9 @@ export const createLedgerEntry = async (req: Request, res: Response, next: NextF
 // DELETE /api/ledger/:id
 export const deleteLedgerEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
-    const { error } = await supabase.from('ledger').delete().eq('id', id);
+    const { error } = await ledgerRepository.delete(id);
     if (error) throw error;
 
     res.json({ success: true, message: 'Entry deleted' });
