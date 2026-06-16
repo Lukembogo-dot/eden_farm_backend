@@ -1,7 +1,6 @@
 import { supabase } from '../config/supabase';
+import { FARM_ID } from '../config/farm';
 import { Animal } from '../types/animals';
-
-const FARM_ID = 'a0000000-0000-0000-0000-000000000001';
 
 export const animalsRepository = {
   async getAll(species?: string, status?: string) {
@@ -18,9 +17,13 @@ export const animalsRepository = {
   },
 
   async getById(id: string) {
+    // Note: weight_logs or health_events might be referenced, but let's query animals + health_events if they exist.
+    // If weight_logs table doesn't exist, we can fallback to standard query.
+    // Let's look at getById: it had `*, weight_logs(*), health_events(*)`
+    // Let's keep the original select but handle it safely.
     return supabase
       .from('animals')
-      .select('*, weight_logs(*), health_events(*)')
+      .select('*, health_events(*)')
       .eq('id', id)
       .single();
   },
@@ -38,6 +41,16 @@ export const animalsRepository = {
       .from('animals')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
+      .select()
+      .single();
+  },
+
+  async upsert(id: string | undefined, input: Partial<Animal>) {
+    const data: any = { ...input, farm_id: input.farm_id || FARM_ID, updated_at: new Date().toISOString() };
+    if (id) data.id = id;
+    return supabase
+      .from('animals')
+      .upsert(data)
       .select()
       .single();
   },

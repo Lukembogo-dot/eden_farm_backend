@@ -1,7 +1,6 @@
 import { supabase } from '../config/supabase';
+import { FARM_ID } from '../config/farm';
 import { Sale } from '../types/sales';
-
-const FARM_ID = 'a0000000-0000-0000-0000-000000000001';
 
 export const salesRepository = {
   async getAll() {
@@ -16,6 +15,14 @@ export const salesRepository = {
     return supabase
       .from('sales')
       .insert([{ ...input, farm_id: input.farm_id || FARM_ID, sale_type: input.sale_type || 'live' }])
+      .select()
+      .single();
+  },
+
+  async upsert(id: string, input: Partial<Sale>) {
+    return supabase
+      .from('sales')
+      .upsert({ ...input, id, farm_id: input.farm_id || FARM_ID, sale_type: input.sale_type || 'live' })
       .select()
       .single();
   },

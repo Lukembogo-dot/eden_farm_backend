@@ -18,14 +18,12 @@ export const ledgerRepository = {
 
     if (error) throw error;
 
-
     const summary: LedgerSummary = {
       totalExpenses: 0,
       totalIncome: 0,
       netPosition: 0,
       byCategory: {},
     };
-    
 
     data.forEach((entry: { category: string; amount: number; entry_type: string }) => {
       if (entry.entry_type === 'income') {
@@ -44,7 +42,15 @@ export const ledgerRepository = {
   async create(entry: LedgerEntry) {
     return supabase
       .from('ledger')
-      .insert([{ ...entry, farm_id: entry.farm_id || FARM_ID || 'a0000000-0000-0000-0000-000000000001', entry_type: entry.entry_type || 'expense' }])
+      .insert([{ ...entry, farm_id: entry.farm_id || FARM_ID, entry_type: entry.entry_type || 'expense' }])
+      .select()
+      .single();
+  },
+
+  async upsert(id: string, entry: Partial<LedgerEntry>) {
+    return supabase
+      .from('ledger')
+      .upsert({ ...entry, id, farm_id: entry.farm_id || FARM_ID, entry_type: entry.entry_type || 'expense' })
       .select()
       .single();
   },

@@ -66,3 +66,19 @@ export const createSale = async (req: Request, res: Response, next: NextFunction
     next(err);
   }
 };
+
+// PUT /api/sales/:id
+export const upsertSale = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const input = req.body as Partial<Sale>;
+
+    const { data, error } = await salesRepository.upsert(id, input);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};

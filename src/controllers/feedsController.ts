@@ -70,3 +70,19 @@ export const restockFeed = async (req: Request, res: Response, next: NextFunctio
     next(err);
   }
 };
+
+// PUT /api/feeds/:id
+export const upsertFeed = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const input = req.body as Partial<FeedStock>;
+
+    const { data, error } = await feedsRepository.upsert(id, input);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -10,6 +10,7 @@ import feedsRouter from './routes/feeds';
 import salesRouter from './routes/sales';
 import healthRouter from './routes/health';
 import alertsRouter from './routes/alerts';
+import statsRouter from './routes/stats';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/feeds', feedsRouter);
 app.use('/api/sales', salesRouter);
 app.use('/api/health-events', healthRouter);
 app.use('/api/alerts', alertsRouter);
+app.use('/api/stats', statsRouter);
 
 // ── Health check ──
 app.get('/', (req, res) => {

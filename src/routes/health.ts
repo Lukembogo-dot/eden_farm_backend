@@ -1,6 +1,18 @@
 import { Router } from 'express';
+import {
+  getHealthEvents,
+  getHealthEventById,
+  createHealthEvent,
+  upsertHealthEvent,
+  deleteHealthEvent
+} from '../controllers/healthController';
+
 const router = Router();
 
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'Health events route OK' }));
+router.get('/', getHealthEvents);
+router.get('/:id', getHealthEventById);
+router.post('/', createHealthEvent);
+router.put('/:id', upsertHealthEvent);
+router.delete('/:id', deleteHealthEvent);
 
 export default router;

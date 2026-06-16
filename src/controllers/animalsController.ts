@@ -94,3 +94,19 @@ export const deleteAnimal = async (req: Request, res: Response, next: NextFuncti
     next(err);
   }
 };
+
+// PUT /api/animals/:id
+export const upsertAnimal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const input = req.body as Partial<Animal>;
+
+    const { data, error } = await animalsRepository.upsert(id, input);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -75,3 +75,19 @@ export const deleteLedgerEntry = async (req: Request, res: Response, next: NextF
     next(err);
   }
 };
+
+// PUT /api/ledger/:id
+export const upsertLedgerEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const input = req.body as Partial<LedgerEntry>;
+
+    const { data, error } = await ledgerRepository.upsert(id, input);
+
+    if (error) throw error;
+
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};
