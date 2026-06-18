@@ -9,6 +9,8 @@ export interface Animal {
   age_at_acquisition?: number | null;
   acquisition_cost?: number | null;
   source?: string | null;
+  litter_size?: number | null;
+  birth_date?: string | null;
   status?: string | null;
   notes?: string | null;
   created_at?: string;

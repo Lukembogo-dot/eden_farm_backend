@@ -33,6 +33,9 @@ export const statsRepository = {
     const totalAnimals = animals?.length || 0;
     const speciesCounts: Record<string, number> = {};
     let activeAnimalsCount = 0;
+    const pigletAnimals = animals?.filter((animal) => (animal.species || '').toLowerCase() === 'piglet') || [];
+    const pigletCount = pigletAnimals.length;
+    const activePigletCount = pigletAnimals.filter((animal) => animal.status !== 'sold').length;
 
     animals?.forEach((animal) => {
       const species = (animal.species || 'unknown').toLowerCase();
@@ -67,6 +70,10 @@ export const statsRepository = {
         total: totalAnimals,
         active: activeAnimalsCount,
         by_species: speciesCounts,
+      },
+      piglets: {
+        total: pigletCount,
+        active: activePigletCount,
       },
       sales: {
         total_count: totalSalesCount,

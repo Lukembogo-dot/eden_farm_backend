@@ -9,6 +9,7 @@ import ledgerRouter from './routes/ledger';
 import feedsRouter from './routes/feeds';
 import salesRouter from './routes/sales';
 import healthRouter from './routes/health';
+import breedingRouter from './routes/breeding';
 import alertsRouter from './routes/alerts';
 import statsRouter from './routes/stats';
 
@@ -29,6 +30,7 @@ app.use('/api/ledger', ledgerRouter);
 app.use('/api/feeds', feedsRouter);
 app.use('/api/sales', salesRouter);
 app.use('/api/health-events', healthRouter);
+app.use('/api/breeding-records', breedingRouter);
 app.use('/api/alerts', alertsRouter);
 app.use('/api/stats', statsRouter);
 

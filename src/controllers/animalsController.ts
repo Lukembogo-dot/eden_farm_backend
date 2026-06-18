@@ -38,7 +38,7 @@ export const getAnimalById = async (req: Request, res: Response, next: NextFunct
 // POST /api/animals
 export const createAnimal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { tag_id, species, breed, batch_id, date_acquired, age_at_acquisition, acquisition_cost, source, notes } = req.body as Animal;
+    const { tag_id, species, breed, batch_id, date_acquired, age_at_acquisition, acquisition_cost, source, litter_size, birth_date, notes } = req.body as Animal;
 
     if (!species) {
       res.status(400).json({ success: false, error: 'species is required' });
@@ -55,6 +55,8 @@ export const createAnimal = async (req: Request, res: Response, next: NextFuncti
       age_at_acquisition,
       acquisition_cost,
       source,
+      litter_size,
+      birth_date,
       notes,
     } as Animal);
 
