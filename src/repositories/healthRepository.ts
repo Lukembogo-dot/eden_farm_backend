@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID } from '../config/farm';
-import { HealthEvent } from '../types/health';
+import { HealthEvent } from '../types/health.types';
 
 export const healthRepository = {
   async getAll() {

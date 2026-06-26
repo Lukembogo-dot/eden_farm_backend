@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID } from '../config/farm';
-import { Animal } from '../types/animals';
+import { Animal } from '../types/animal.types';
 
 export const animalsRepository = {
   async getAll(species?: string, status?: string) {

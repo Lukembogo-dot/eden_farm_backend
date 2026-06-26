@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID } from '../config/farm';
-import { BreedingRecord } from '../types/breeding';
+import { BreedingRecord } from '../types/breeding.types';
 
 export const breedingRepository = {
   async getAll() {

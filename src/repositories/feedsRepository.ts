@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID } from '../config/farm';
-import { FeedStock } from '../types/feeds';
+import { FeedStock } from '../types/feed.types';
 
 export const feedsRepository = {
   async getAll() {

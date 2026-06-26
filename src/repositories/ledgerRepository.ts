@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID, applyFarmFilter } from '../config/farm';
-import { LedgerEntry, LedgerSummary } from '../types/ledger';
+import { LedgerEntry, LedgerSummary } from '../types/ledger.types';
 
 export const ledgerRepository = {
   async getAll(limit = 5) {

@@ -4,6 +4,14 @@ export interface AppError extends Error {
   statusCode?: number;
 }
 
+export class ApiError extends Error implements AppError {
+  statusCode: number;
+  constructor(statusCode: number, message: string) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
 export const errorHandler = (
   err: AppError,
   req: Request,

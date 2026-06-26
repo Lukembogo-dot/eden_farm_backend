@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import { FARM_ID } from '../config/farm';
-import { Sale } from '../types/sales';
+import { Sale } from '../types/sale.types';
 
 export const salesRepository = {
   async getAll() {
