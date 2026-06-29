@@ -23,10 +23,10 @@ export const animalsController = {
     res.json({ success: true, data });
   },
 
-  async delete(req: Request, res: Response) {
-    await animalsService.delete(String(req.params.id));
-    res.json({ success: true, message: 'Animal deleted' });
-  },
+ async delete(req: Request, res: Response) {
+  const data = await animalsService.delete(String(req.params.id));
+  res.json({ success: true, message: 'Animal marked as removed', data });
+},
 
   async addWeightLog(req: Request, res: Response) {
     const { weighed_date, weight_kg, notes } = req.body;

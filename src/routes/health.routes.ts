@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { feedsController } from '../controllers/feeds.Controller';
+import { healthController } from '../controllers/health.Controller';
 import { asyncHandler } from '../middleware/asyncHandler';
 
 const router = Router();
 
-router.get('/', asyncHandler(feedsController.getAll));
-router.post('/purchase', asyncHandler(feedsController.purchase));
-router.patch('/:id/consume', asyncHandler(feedsController.consume));
+router.get('/', asyncHandler(healthController.getAll));
+router.post('/', asyncHandler(healthController.create));
 
 export default router;

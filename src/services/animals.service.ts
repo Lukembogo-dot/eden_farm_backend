@@ -75,10 +75,18 @@ export const animalsService = {
     return data;
   },
 
-  async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('animals').delete().eq('id', id);
-    if (error) throw new ApiError(500, error.message);
-  },
+ async delete(id: string): Promise<Animal> {
+  // Soft delete — preserves ledger history and audit trail
+  const { data, error } = await supabase
+    .from('animals')
+    .update({ status: 'removed', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw new ApiError(500, error.message);
+  return data;
+},
 
   async addWeightLog(animalId: string, weighed_date: string, weight_kg: number, notes?: string): Promise<WeightLog> {
     const { data, error } = await supabase

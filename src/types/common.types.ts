@@ -5,7 +5,7 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-export type AnimalStatus = 'active' | 'sold' | 'slaughtered' | 'deceased';
+export type AnimalStatus = 'active' | 'sold' | 'slaughtered' | 'deceased' | 'removed';
 export type AnimalOrigin = 'purchased' | 'born';
 export type Gender = 'male' | 'female';
 export type EntryType = 'expense' | 'income';
